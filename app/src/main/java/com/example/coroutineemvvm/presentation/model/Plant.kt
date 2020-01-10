@@ -16,3 +16,7 @@ data class Plant(
 ) {
     override fun toString() = name
 }
+
+inline class GrowZone(val number: Int)
+
+val NoGrowZone = GrowZone(-1)

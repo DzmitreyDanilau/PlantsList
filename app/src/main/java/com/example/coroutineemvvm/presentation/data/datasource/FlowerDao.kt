@@ -13,7 +13,11 @@ interface FlowerDao {
     @Query("SELECT * FROM $DB_NAME ORDER BY name")
     fun getPlants(): LiveData<List<Plant>>
 
+    @Query("SELECT * FROM plants WHERE growZoneNumber = :growZoneNumber ORDER BY name")
+    fun getPlantsByGrownZone(growZoneNumber: Int): LiveData<List<Plant>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(plants: List<Plant>)
+    fun insertAll(plants: List<Plant>)
+
 
 }

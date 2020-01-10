@@ -1,62 +1,91 @@
-package com.example.coroutineemvvm.presentation.presentation.ui
-
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.coroutineemvvm.R
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
+import com.example.coroutineemvvm.presentation.domain.interactor.FlowerInteractor
+import com.example.coroutineemvvm.presentation.presentation.ui.PlantsListViewModel
+import com.example.coroutineemvvm.presentation.utils.Injector
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FlowerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FlowerFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    private val viewModel: PlantsListViewModel by viewModels {
+        Injector.providePlantListViewModelFactory(requireContext())
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_flower, container, false)
-    }
+//        val binding = FragmentPlantListBinding.inflate(inflater, container, false)
+//        context ?: return binding.root
 
+        // show the spinner when [spinner] is true
+        viewModel.spinner.observe(viewLifecycleOwner) { show ->
+            //            binding.spinner.visibility = if (show) View.VISIBLE else View.GONE
+        }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FlowerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FlowerFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+        // Show a snackbar whenever the [snackbar] is updated a non-null value
+        viewModel.snackbar.observe(viewLifecycleOwner) { text ->
+            text?.let {
+                //                Snackbar.make(binding.root, text, Snackbar.LENGTH_SHORT).show()
+                viewModel.onSnackbarShown()
             }
+        }
+
+//        val adapter = PlantAdapter()
+//        binding.plantList.adapter = adapter
+//        subscribeUi(adapter)
+
+        setHasOptionsMenu(true)
+        return view
     }
+
+//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        inflater.inflate(R.menu.menu_plant_list, menu)
+//    }
+
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        return when (item.itemId) {
+//            R.id.filter_zone -> {
+//                updateData()
+//                true
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//    }
+
+//    private fun subscribeUi(adapter: PlantAdapter) {
+//        viewModel.plants.observe(viewLifecycleOwner) { plants ->
+//            adapter.submitList(plants)
+//        }
+//    }
+
+//    private fun updateData() {
+//        with(viewModel) {
+//            if (isFiltered()) {
+//                clearGrowZoneNumber()
+//            } else {
+//                setGrowZoneNumber(9)
+//            }
+//        }
+//    }
 }
+
+/**
+ * Factory for creating a [PlantListViewModel] with a constructor that takes a [PlantRepository].
+ */
+class PlantListViewModelFactory(
+    private val interactor: FlowerInteractor
+) : ViewModelProvider.NewInstanceFactory() {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>) = PlantsListViewModel(interactor) as T
+}
+
+

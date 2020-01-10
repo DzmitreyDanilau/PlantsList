@@ -1,7 +1,9 @@
 package com.example.coroutineemvvm.presentation.domain.interactor
 
+import androidx.lifecycle.LiveData
 import com.example.coroutineemvvm.presentation.model.Plant
 
 interface FlowerInteractor {
-    suspend fun fetchFlowers(): List<Plant>
+    fun getPlants(): LiveData<List<Plant>>
+    fun getPlantsWithGrowZone(growZone: Int): LiveData<List<Plant>>
 }

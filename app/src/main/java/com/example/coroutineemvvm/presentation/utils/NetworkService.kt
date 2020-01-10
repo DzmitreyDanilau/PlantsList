@@ -17,10 +17,14 @@ class NetworkService {
 
     private val service = retrofit.create(FlowerService::class.java)
 
+    //When we try to do some actions with fetched data,
+    // best practice would be do this work in another CoroutinesScope (IO/Default)
+
     suspend fun getPlants(): List<Plant> = withContext(IO) {
         val result = service.getPlants()
         result.shuffled()
     }
+
 }
 
 interface FlowerService {
